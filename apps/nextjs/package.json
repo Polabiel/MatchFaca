@@ -36,6 +36,7 @@
     "@matchfaca/prettier-config": "workspace:*",
     "@matchfaca/tailwind-config": "workspace:*",
     "@matchfaca/tsconfig": "workspace:*",
+    "@prisma/nextjs-monorepo-workaround-plugin": "^7.9.0",
     "@types/node": "^22.15.3",
     "@types/react": "catalog:react19",
     "@types/react-dom": "catalog:react19",

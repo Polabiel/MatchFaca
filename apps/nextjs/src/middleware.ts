@@ -1,11 +1,9 @@
-export { auth as middleware } from "@matchfaca/auth";
+import NextAuth from "next-auth";
+import Discord from "next-auth/providers/discord";
 
-// Or like this if you need to do something here.
-// export default auth((req) => {
-//   console.log(req.auth) //  { session: { user: { ... } } }
-// })
+// Middleware only checks JWT — no Prisma adapter needed (edge-compatible)
+export const { auth: middleware } = NextAuth({ providers: [Discord] });
 
-// Read more: https://nextjs.org/docs/app/building-your-application/routing/middleware#matcher
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };

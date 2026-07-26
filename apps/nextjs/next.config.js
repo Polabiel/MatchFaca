@@ -9,13 +9,9 @@ const config = {
   /** Enables hot reloading for local packages without a build step */
   transpilePackages: [
     "@matchfaca/api",
-    "@matchfaca/auth",
-    "@matchfaca/db",
     "@matchfaca/ui",
     "@matchfaca/validators",
   ],
-
-  output: "standalone",
 
   /** We already do linting and typechecking as separate tasks in CI */
   eslint: { ignoreDuringBuilds: true },
