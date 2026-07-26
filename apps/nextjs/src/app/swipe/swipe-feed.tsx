@@ -20,15 +20,6 @@ export function SwipeFeed() {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const isExhausted = profiles.length === 0 || currentIndex >= profiles.length;
-  const currentProfile = profiles[currentIndex];
-
-  const handleSkip = () => {
-    setCurrentIndex((i) => i + 1);
-  };
-
-  const handleChallenge = () => {
-    setCurrentIndex((i) => i + 1);
-  };
 
   // Empty state — no profiles at all OR all swiped
   if (isExhausted) {
@@ -49,6 +40,17 @@ export function SwipeFeed() {
       </div>
     );
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const currentProfile = profiles[currentIndex]!;
+
+  const handleSkip = () => {
+    setCurrentIndex((i) => i + 1);
+  };
+
+  const handleChallenge = () => {
+    setCurrentIndex((i) => i + 1);
+  };
 
   return (
     <div className="flex flex-col items-center gap-6">

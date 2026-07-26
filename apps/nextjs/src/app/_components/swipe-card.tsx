@@ -124,7 +124,7 @@ export function SwipeCard({
       {/* Background */}
       {hasPhoto ? (
         <img
-          src={profile.photo}
+          src={profile.photo ?? ""}
           alt={nickname}
           className="absolute inset-0 size-full object-cover"
           onError={() => setImageError(true)}

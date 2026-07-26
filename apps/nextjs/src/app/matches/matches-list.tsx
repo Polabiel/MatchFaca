@@ -177,10 +177,7 @@ function MatchCard({ match }: { match: Match }) {
     <div className="rounded-xl border border-border/60 bg-card p-4 transition-colors hover:border-border">
       {/* Opponent info */}
       <div className="flex items-center gap-3">
-        <Avatar
-          name={opponent.name ?? "Desconhecido"}
-          image={opponent.image}
-        />
+        <Avatar name={opponent.name ?? "Desconhecido"} image={opponent.image} />
 
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold text-foreground">

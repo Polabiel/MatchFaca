@@ -55,9 +55,9 @@ const weightClassValues = WEIGHT_OPTIONS.map((o) => o.value);
 const ProfileFormSchema = z.object({
   nickname: z.string().min(2, "Mínimo de 2 caracteres").max(60),
   bio: z.string().max(500).optional().or(z.literal("")),
-  fightingStyle: z.enum(fightingStyleValues),
+  fightingStyle: z.enum(fightingStyleValues as [string, ...string[]]),
   weightClass: z
-    .enum(weightClassValues)
+    .enum(weightClassValues as [string, ...string[]])
     .optional()
     .or(z.literal("")),
   latitude: z.number().min(-90).max(90).optional(),
