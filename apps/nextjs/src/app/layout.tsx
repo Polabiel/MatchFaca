@@ -2,11 +2,11 @@ import type { Metadata, Viewport } from "next";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 
-import { cn } from "@acme/ui";
-import { ThemeProvider, ThemeToggle } from "@acme/ui/theme";
-import { Toaster } from "@acme/ui/toast";
+import { cn } from "@matchfaca/ui";
+import { Toaster } from "@matchfaca/ui/toast";
 
 import { TRPCReactProvider } from "~/trpc/react";
+import { NavBar } from "./_components/nav-bar";
 
 import "~/app/globals.css";
 
@@ -15,34 +15,33 @@ import { env } from "~/env";
 export const metadata: Metadata = {
   metadataBase: new URL(
     env.VERCEL_ENV === "production"
-      ? "https://turbo.t3.gg"
+      ? "https://matchfaca.app"
       : "http://localhost:3000",
   ),
-  title: "Create T3 Turbo",
-  description: "Simple monorepo with shared backend for web & mobile apps",
+  title: "matchFaca — Encontros que Escalam",
+  description:
+    "O Tinder da porrada. Encontre oponentes, marque brigas, resolva no soco.",
   openGraph: {
-    title: "Create T3 Turbo",
-    description: "Simple monorepo with shared backend for web & mobile apps",
-    url: "https://create-t3-turbo.vercel.app",
-    siteName: "Create T3 Turbo",
+    title: "matchFaca — Encontros que Escalam",
+    description:
+      "O Tinder da porrada. Encontre oponentes, marque brigas, resolva no soco.",
+    url: "https://matchfaca.app",
+    siteName: "matchFaca",
   },
   twitter: {
     card: "summary_large_image",
-    site: "@jullerino",
-    creator: "@jullerino",
   },
 };
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "white" },
     { media: "(prefers-color-scheme: dark)", color: "black" },
   ],
 };
 
 export default function RootLayout(props: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="dark" suppressHydrationWarning>
       <body
         className={cn(
           "min-h-screen bg-background font-sans text-foreground antialiased",
@@ -50,13 +49,13 @@ export default function RootLayout(props: { children: React.ReactNode }) {
           GeistMono.variable,
         )}
       >
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <TRPCReactProvider>{props.children}</TRPCReactProvider>
-          <div className="absolute bottom-4 right-4">
-            <ThemeToggle />
+        <TRPCReactProvider>
+          <div className="relative mx-auto max-w-lg pb-20">
+            {props.children}
           </div>
-          <Toaster />
-        </ThemeProvider>
+          <NavBar />
+        </TRPCReactProvider>
+        <Toaster />
       </body>
     </html>
   );

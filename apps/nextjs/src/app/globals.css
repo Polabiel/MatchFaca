@@ -10,8 +10,8 @@
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
-    --primary: 327 66% 69%;
-    --primary-foreground: 337 65.5% 17.1%;
+    --primary: 0 68% 50%;
+    --primary-foreground: 0 0% 98%;
     --secondary: 240 4.8% 95.9%;
     --secondary-foreground: 240 5.9% 10%;
     --muted: 240 4.8% 95.9%;
@@ -22,29 +22,117 @@
     --destructive-foreground: 0 0% 98%;
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
-    --ring: 240 5% 64.9%;
+    --ring: 0 68% 50%;
     --radius: 0.5rem;
   }
 
   .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 327 66% 69%;
-    --primary-foreground: 337 65.5% 17.1%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
+    --background: 0 0% 4%;
+    --foreground: 0 0% 96%;
+    --card: 0 0% 6%;
+    --card-foreground: 0 0% 96%;
+    --popover: 0 0% 6%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 0 72% 48%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 96%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 55%;
+    --accent: 0 0% 12%;
+    --accent-foreground: 0 0% 96%;
+    --destructive: 0 72% 38%;
     --destructive-foreground: 0 85.7% 97.3%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
+    --border: 0 0% 14%;
+    --input: 0 0% 14%;
+    --ring: 0 72% 48%;
+  }
+}
+
+@layer utilities {
+  .bg-blood-gradient {
+    background: linear-gradient(135deg, hsl(0 72% 48% / 0.4), hsl(0 0% 4% / 0.9));
+  }
+
+  .bg-card-overlay {
+    background: linear-gradient(
+      to top,
+      hsl(0 0% 4%) 0%,
+      hsl(0 0% 4% / 0.85) 25%,
+      transparent 60%
+    );
+  }
+
+  .shadow-blood {
+    box-shadow: 0 8px 32px hsl(0 72% 48% / 0.25);
+  }
+
+  .glow-fire {
+    box-shadow: 0 0 24px hsl(0 100% 50% / 0.5), 0 0 48px hsl(25 100% 50% / 0.3);
+  }
+
+  .glow-fire:hover {
+    box-shadow: 0 0 32px hsl(0 100% 50% / 0.6), 0 0 64px hsl(25 100% 50% / 0.4);
+  }
+
+  .bg-noise {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 128px 128px;
+  }
+
+  .swipe-card-enter {
+    animation: swipeCardEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .swipe-card-exit-left {
+    animation: swipeCardExitLeft 0.3s ease-in forwards;
+  }
+
+  .swipe-card-exit-right {
+    animation: swipeCardExitRight 0.3s ease-in forwards;
+  }
+}
+
+@keyframes swipeCardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes swipeCardExitLeft {
+  from {
+    opacity: 1;
+    transform: translateX(0) rotate(0deg);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-150%) rotate(-12deg);
+  }
+}
+
+@keyframes swipeCardExitRight {
+  from {
+    opacity: 1;
+    transform: translateX(0) rotate(0deg);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(150%) rotate(12deg);
+  }
+}
+
+@keyframes pulse-blood {
+  0%,
+  100% {
+    box-shadow: 0 0 12px hsl(0 72% 48% / 0.4);
+  }
+  50% {
+    box-shadow: 0 0 24px hsl(0 72% 48% / 0.7);
   }
 }
