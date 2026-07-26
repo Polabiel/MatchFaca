@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { AppState, AppStateStatus } from "react-native";
+import { AppState, type AppStateStatus } from "react-native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useQueryClient } from "@tanstack/react-query";

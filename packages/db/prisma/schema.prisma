@@ -125,6 +125,8 @@ model Profile {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([latitude, longitude], name: "profile_location_idx")
+  @@index([fightingStyle], name: "profile_fighting_style_idx")
+  @@index([wins, losses], name: "profile_wl_ratio_idx")
   @@map("profile")
 }
 

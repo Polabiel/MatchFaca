@@ -11,7 +11,8 @@
     "./input": "./src/input.tsx",
     "./label": "./src/label.tsx",
     "./theme": "./src/theme.tsx",
-    "./toast": "./src/toast.tsx"
+    "./toast": "./src/toast.tsx",
+    "./hooks/use-debounced-value": "./src/hooks/use-debounced-value.ts"
   },
   "license": "MIT",
   "scripts": {

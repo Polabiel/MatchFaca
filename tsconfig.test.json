@@ -1,0 +1,13 @@
+{
+  "extends": "./tooling/typescript/base.json",
+  "compilerOptions": {
+    "verbatimModuleSyntax": false,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "noEmit": false,
+    "outDir": ".tmp/matchfaca-tests",
+    "types": ["node"]
+  },
+  "include": ["tests/**/*.ts"],
+  "exclude": ["node_modules", ".tmp"]
+}

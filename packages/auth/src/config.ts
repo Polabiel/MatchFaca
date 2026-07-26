@@ -1,3 +1,4 @@
+import { writeFileSync, readFileSync } from "node:fs";
 import type {
   DefaultSession,
   NextAuthConfig,
@@ -19,12 +20,54 @@ declare module "next-auth" {
   }
 }
 
+// ─── Auth error debug infrastructure ────────────────────
+// Ported from Yield: writes auth errors to /tmp for debugging via API
+
+const AUTH_ERROR_PATH = "/tmp/matchfaca-auth-error.json";
+
+function writeAuthError(error: unknown) {
+  const entry = JSON.stringify({
+    t: Date.now(),
+    m: error instanceof Error ? error.message : String(error),
+    n: error instanceof Error ? error.name : typeof error,
+    s:
+      error instanceof Error
+        ? error.stack?.split("\n").slice(0, 6).join("\n")
+        : undefined,
+    c:
+      error instanceof Error && error.cause
+        ? error.cause instanceof Error
+          ? {
+              m: error.cause.message,
+              s: error.cause.stack?.split("\n").slice(0, 4).join("\n"),
+            }
+          : JSON.stringify(error.cause)
+        : undefined,
+  });
+  try {
+    writeFileSync(AUTH_ERROR_PATH, entry, "utf-8");
+  } catch {}
+}
+
+export function readLastAuthError(): Record<string, unknown> | null {
+  try {
+    const content = readFileSync(AUTH_ERROR_PATH, "utf-8");
+    return JSON.parse(content) as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+}
+
 const adapter = PrismaAdapter(db);
 
 export const isSecureContext = env.NODE_ENV !== "development";
 
 export const authConfig = {
   adapter,
+  pages: {
+    signIn: "/login",
+    error: "/auth/error",
+  },
   // In development, we need to skip checks to allow Expo to work
   ...(!isSecureContext
     ? {
@@ -34,6 +77,15 @@ export const authConfig = {
     : {}),
   secret: env.AUTH_SECRET,
   providers: [Discord],
+  logger: {
+    error(error) {
+      writeAuthError(error);
+      console.error(
+        "[auth error]",
+        error instanceof Error ? error.message : error,
+      );
+    },
+  },
   callbacks: {
     session: (opts) => {
       if (!("user" in opts))
