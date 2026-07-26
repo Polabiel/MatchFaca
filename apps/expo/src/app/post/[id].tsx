@@ -1,24 +1,31 @@
-import { SafeAreaView, Text, View } from "react-native";
-import { Stack, useGlobalSearchParams } from "expo-router";
-import { useQuery } from "@tanstack/react-query";
-
-import { trpc } from "~/utils/api";
+import { Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Link, Stack } from "expo-router";
 
 export default function Post() {
-  const { id } = useGlobalSearchParams();
-  if (!id || typeof id !== "string") throw new Error("unreachable");
-  const { data } = useQuery(trpc.post.byId.queryOptions({ id }));
-
-  if (!data) return null;
-
   return (
-    <SafeAreaView className="bg-background">
-      <Stack.Screen options={{ title: data.title }} />
-      <View className="h-full w-full p-4">
-        <Text className="py-2 text-3xl font-bold text-primary">
-          {data.title}
+    <SafeAreaView className="flex-1 bg-[#0D0D0D]">
+      <Stack.Screen
+        options={{
+          title: "Posts",
+          headerStyle: { backgroundColor: "#0D0D0D" },
+          headerTitleStyle: { color: "#DC2626", fontWeight: "bold" },
+          headerTintColor: "#DC2626",
+        }}
+      />
+      <View className="flex-1 items-center justify-center px-8">
+        <Text className="mb-4 text-6xl">🗡️</Text>
+        <Text className="text-center text-lg font-semibold text-white">
+          Funcionalidade removida
         </Text>
-        <Text className="py-4 text-foreground">{data.content}</Text>
+        <Text className="mt-2 text-center text-sm text-gray-500">
+          O sistema de posts foi substituído pelo matchFaca
+        </Text>
+        <Link href="/swipe" asChild>
+          <View className="mt-6 rounded-xl bg-[#DC2626] px-6 py-3">
+            <Text className="font-bold text-white">Ir para o Swipe</Text>
+          </View>
+        </Link>
       </View>
     </SafeAreaView>
   );

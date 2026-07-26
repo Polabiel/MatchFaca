@@ -1,5 +1,5 @@
 {
-  "name": "@acme/db",
+  "name": "@matchfaca/db",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -36,14 +36,14 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@acme/eslint-config": "workspace:*",
-    "@acme/prettier-config": "workspace:*",
-    "@acme/tsconfig": "workspace:*",
+    "@matchfaca/eslint-config": "workspace:*",
+    "@matchfaca/prettier-config": "workspace:*",
+    "@matchfaca/tsconfig": "workspace:*",
     "dotenv-cli": "^8.0.0",
     "drizzle-kit": "^0.31.0",
     "eslint": "catalog:",
     "prettier": "catalog:",
     "typescript": "catalog:"
   },
-  "prettier": "@acme/prettier-config"
+  "prettier": "@matchfaca/prettier-config"
 }

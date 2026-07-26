@@ -1,5 +1,5 @@
 {
-  "name": "@acme/auth-proxy",
+  "name": "@matchfaca/auth-proxy",
   "private": true,
   "type": "module",
   "scripts": {
@@ -13,10 +13,10 @@
     "@auth/core": "catalog:"
   },
   "devDependencies": {
-    "@acme/eslint-config": "workspace:*",
-    "@acme/prettier-config": "workspace:*",
-    "@acme/tailwind-config": "workspace:*",
-    "@acme/tsconfig": "workspace:*",
+    "@matchfaca/eslint-config": "workspace:*",
+    "@matchfaca/prettier-config": "workspace:*",
+    "@matchfaca/tailwind-config": "workspace:*",
+    "@matchfaca/tsconfig": "workspace:*",
     "@types/node": "^22.15.3",
     "eslint": "catalog:",
     "h3": "^1.15.3",
@@ -24,5 +24,5 @@
     "prettier": "catalog:",
     "typescript": "catalog:"
   },
-  "prettier": "@acme/prettier-config"
+  "prettier": "@matchfaca/prettier-config"
 }

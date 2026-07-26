@@ -1,5 +1,5 @@
 {
-  "name": "@acme/expo",
+  "name": "@matchfaca/expo",
   "version": "0.1.0",
   "private": true,
   "main": "index.ts",
@@ -42,14 +42,14 @@
     "superjson": "2.2.2"
   },
   "devDependencies": {
-    "@acme/api": "workspace:*",
-    "@acme/eslint-config": "workspace:*",
-    "@acme/prettier-config": "workspace:*",
-    "@acme/tailwind-config": "workspace:*",
-    "@acme/tsconfig": "workspace:*",
     "@babel/core": "^7.27.1",
     "@babel/preset-env": "^7.27.1",
     "@babel/runtime": "^7.27.1",
+    "@matchfaca/api": "workspace:*",
+    "@matchfaca/eslint-config": "workspace:*",
+    "@matchfaca/prettier-config": "workspace:*",
+    "@matchfaca/tailwind-config": "workspace:*",
+    "@matchfaca/tsconfig": "workspace:*",
     "@types/babel__core": "^7.20.5",
     "@types/react": "catalog:react19",
     "eslint": "catalog:",
@@ -57,5 +57,5 @@
     "tailwindcss": "catalog:",
     "typescript": "catalog:"
   },
-  "prettier": "@acme/prettier-config"
+  "prettier": "@matchfaca/prettier-config"
 }
