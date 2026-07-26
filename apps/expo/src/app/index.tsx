@@ -1,11 +1,19 @@
 import React from "react";
-import { Button, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, Button, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Stack } from "expo-router";
 
-import { useSignIn, useSignOut, useUser } from "~/utils/auth";
+import { useSession, useSignIn, useSignOut, useUser } from "~/utils/auth";
 import { NavBar } from "./_components/nav-bar";
 import { SwipeFeed } from "./swipe";
+
+function LoadingScreen() {
+  return (
+    <SafeAreaView className="flex-1 items-center justify-center bg-[#0D0D0D]">
+      <ActivityIndicator size="large" color="#DC2626" />
+    </SafeAreaView>
+  );
+}
 
 function AuthScreen() {
   const signIn = useSignIn();
@@ -74,9 +82,15 @@ function AuthenticatedApp() {
 }
 
 export default function Index() {
+  const { data: session, isLoading, isFetched } = useSession();
   const user = useUser();
 
-  if (!user) return <AuthScreen />;
+  // Loading state: prevent flash of AuthScreen while session is being checked
+  if (isLoading && !isFetched) {
+    return <LoadingScreen />;
+  }
+
+  if (!session?.user || !user) return <AuthScreen />;
 
   return <AuthenticatedApp />;
 }

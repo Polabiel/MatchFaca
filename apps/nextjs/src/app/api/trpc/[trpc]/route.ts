@@ -3,22 +3,48 @@ import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import { appRouter, createTRPCContext } from "@matchfaca/api";
 import { auth } from "@matchfaca/auth";
 
+const isDev = process.env.NODE_ENV === "development";
+
 /**
- * Configure basic CORS headers
- * You should extend this to match your needs
+ * Configure CORS headers restricted to known origins.
+ * In development, allow any origin for Expo dev client.
+ * In production, restrict to the app's own origin or configured ALLOWED_ORIGINS.
  */
-const setCorsHeaders = (res: Response) => {
-  res.headers.set("Access-Control-Allow-Origin", "*");
-  res.headers.set("Access-Control-Request-Method", "*");
-  res.headers.set("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
-  res.headers.set("Access-Control-Allow-Headers", "*");
+const getAllowedOrigin = (req: Request): string => {
+  if (isDev) return "*";
+
+  const origin = req.headers.get("origin");
+  if (!origin) return "";
+
+  const allowedOrigins = (process.env.ALLOWED_ORIGINS || "")
+    .split(",")
+    .map((o) => o.trim())
+    .filter(Boolean);
+
+  // Always allow same-origin (no origin header = same origin)
+  if (allowedOrigins.includes(origin)) return origin;
+
+  return "";
 };
 
-export const OPTIONS = () => {
+const setCorsHeaders = (res: Response, req: Request) => {
+  const origin = getAllowedOrigin(req);
+  if (origin) {
+    res.headers.set("Access-Control-Allow-Origin", origin);
+  }
+  res.headers.set("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
+  res.headers.set(
+    "Access-Control-Allow-Headers",
+    "Authorization, Content-Type, x-trpc-source",
+  );
+  res.headers.set("Access-Control-Max-Age", "86400");
+};
+
+export const OPTIONS = (req: Request) => {
   const response = new Response(null, {
     status: 204,
   });
-  setCorsHeaders(response);
+  setCorsHeaders(response, req);
   return response;
 };
 
@@ -37,7 +63,7 @@ const handler = auth(async (req) => {
     },
   });
 
-  setCorsHeaders(response);
+  setCorsHeaders(response, req);
   return response;
 });
 

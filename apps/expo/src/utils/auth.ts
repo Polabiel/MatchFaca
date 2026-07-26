@@ -8,25 +8,40 @@ import { getBaseUrl } from "./base-url";
 import { deleteToken, setToken } from "./session-store";
 
 export const signIn = async () => {
-  const signInUrl = `${getBaseUrl()}/api/auth/signin`;
-  const redirectTo = Linking.createURL("/login");
-  const result = await Browser.openAuthSessionAsync(
-    `${signInUrl}?expo-redirect=${encodeURIComponent(redirectTo)}`,
-    redirectTo,
-  );
+  try {
+    const signInUrl = `${getBaseUrl()}/api/auth/signin`;
+    const redirectTo = Linking.createURL("/login");
+    const result = await Browser.openAuthSessionAsync(
+      `${signInUrl}?expo-redirect=${encodeURIComponent(redirectTo)}`,
+      redirectTo,
+    );
 
-  if (result.type !== "success") return false;
-  const url = Linking.parse(result.url);
-  const sessionToken = String(url.queryParams?.session_token);
-  if (!sessionToken) throw new Error("No session token found");
+    if (result.type !== "success") {
+      console.warn("[AUTH] Sign-in cancelled or failed:", result.type);
+      return false;
+    }
 
-  setToken(sessionToken);
+    const url = Linking.parse(result.url);
+    const sessionToken = url.queryParams?.session_token;
+    if (typeof sessionToken !== "string" || !sessionToken) {
+      console.error("[AUTH] No session token in OAuth redirect:", url);
+      return false;
+    }
 
-  return true;
+    await setToken(sessionToken);
+    return true;
+  } catch (e) {
+    console.error("[AUTH] Sign-in failed:", e);
+    return false;
+  }
+};
+
+export const useSession = () => {
+  return useQuery(trpc.auth.getSession.queryOptions());
 };
 
 export const useUser = () => {
-  const { data: session } = useQuery(trpc.auth.getSession.queryOptions());
+  const { data: session } = useSession();
   return session?.user ?? null;
 };
 
@@ -49,8 +64,12 @@ export const useSignOut = () => {
   const router = useRouter();
 
   return async () => {
-    const res = await signOut.mutateAsync();
-    if (!res.success) return;
+    try {
+      const res = await signOut.mutateAsync();
+      if (!res.success) return;
+    } catch (e) {
+      console.error("[AUTH] Sign-out API call failed:", e);
+    }
     await deleteToken();
     await queryClient.invalidateQueries(trpc.pathFilter());
     router.replace("/");

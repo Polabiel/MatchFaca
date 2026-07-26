@@ -30,12 +30,16 @@ export const trpc = createTRPCOptionsProxy<AppRouter>({
       httpBatchLink({
         transformer: superjson,
         url: `${getBaseUrl()}/api/trpc`,
-        headers() {
+        async headers() {
           const headers = new Map<string, string>();
           headers.set("x-trpc-source", "expo-react");
 
-          const token = getToken();
-          if (token) headers.set("Authorization", `Bearer ${token}`);
+          try {
+            const token = await getToken();
+            if (token) headers.set("Authorization", `Bearer ${token}`);
+          } catch (e) {
+            console.warn("[API] Failed to get session token:", e);
+          }
 
           return Object.fromEntries(headers);
         },

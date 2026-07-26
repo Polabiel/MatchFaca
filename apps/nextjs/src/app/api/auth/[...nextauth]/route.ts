@@ -7,6 +7,24 @@ const EXPO_COOKIE_NAME = "__acme-expo-redirect-state";
 const AUTH_COOKIE_PATTERN = /authjs\.session-token=([^;]+)/;
 
 /**
+ * In-memory store for Expo redirect URLs keyed by random state.
+ * Used as fallback when the cookie doesn't survive the OAuth redirect chain
+ * in system browsers (SFSafariViewController / Chrome Custom Tabs).
+ *
+ * Entries expire after 10 minutes.
+ */
+const expoRedirectStore = new Map<string, { redirectTo: string; expiresAt: number }>();
+
+if (typeof setInterval !== "undefined") {
+  setInterval(() => {
+    const now = Date.now();
+    for (const [key, val] of expoRedirectStore) {
+      if (val.expiresAt < now) expoRedirectStore.delete(key);
+    }
+  }, 5 * 60 * 1000);
+}
+
+/**
  * Noop in production.
  *
  * In development, rewrite the request URL to use localhost instead of host IP address
@@ -55,10 +73,9 @@ export const POST = async (
   const req = rewriteRequestUrlInDevelopment(_req);
 
   const nextauthAction = (await props.params).nextauth[0];
-  const isExpoCallback = (await cookies()).get(EXPO_COOKIE_NAME);
 
-  // callback handler required separately in the POST handler
-  // since Apple sends a POST request instead of a GET
+  // 1. Try cookie first (primary path when cookie survives)
+  const isExpoCallback = (await cookies()).get(EXPO_COOKIE_NAME);
   if (nextauthAction === "callback" && !!isExpoCallback) {
     return handleExpoSigninCallback(req, isExpoCallback.value);
   }
@@ -75,21 +92,64 @@ export const GET = async (
 
   const nextauthAction = (await props.params).nextauth[0];
   const isExpoSignIn = req.nextUrl.searchParams.get("expo-redirect");
-  const isExpoCallback = (await cookies()).get(EXPO_COOKIE_NAME);
+  let isExpoCallback = (await cookies()).get(EXPO_COOKIE_NAME);
 
   if (nextauthAction === "signin" && !!isExpoSignIn) {
-    // set a cookie we can read in the callback
-    // to know to send the user back to expo
+    // Primary: set cookie for the callback to read
     (await cookies()).set({
       name: EXPO_COOKIE_NAME,
       value: isExpoSignIn,
       maxAge: 60 * 10, // 10 min
       path: "/",
     });
+
+    // Fallback: store redirect URL in memory keyed by random state,
+    // pass it through the OAuth redirect chain via callbackUrl.
+    // This survives even if the system browser loses the cookie.
+    const state = crypto.randomUUID();
+    expoRedirectStore.set(state, {
+      redirectTo: isExpoSignIn,
+      expiresAt: Date.now() + 10 * 60 * 1000,
+    });
+
+    // Embed expo_state in the callback URL so Discord returns it
+    const url = new URL(req.url);
+    url.searchParams.set(
+      "callbackUrl",
+      `/api/auth/callback/discord?expo_state=${state}`,
+    );
+
+    return handlers.GET(new NextRequest(url, req));
   }
 
-  if (nextauthAction === "callback" && !!isExpoCallback) {
-    return handleExpoSigninCallback(req, isExpoCallback.value);
+  // Callback GET handler — Discord redirects here after OAuth
+  // This runs BEFORE the POST; we use it to re-set the cookie if needed
+  if (nextauthAction === "callback") {
+    // Primary path: cookie survived (set in signin step)
+    if (!!isExpoCallback) {
+      return handleExpoSigninCallback(req, isExpoCallback.value);
+    }
+
+    // Fallback: cookie was lost, try to recover from in-memory store
+    const expoState = req.nextUrl.searchParams.get("expo_state");
+    if (expoState && expoRedirectStore.has(expoState)) {
+      const entry = expoRedirectStore.get(expoState)!;
+      if (entry.expiresAt > Date.now()) {
+        // Re-set the cookie so the POST handler can find it
+        (await cookies()).set({
+          name: EXPO_COOKIE_NAME,
+          value: entry.redirectTo,
+          maxAge: 60 * 10,
+          path: "/",
+        });
+        isExpoCallback = { value: entry.redirectTo, name: EXPO_COOKIE_NAME };
+      }
+      expoRedirectStore.delete(expoState);
+    }
+
+    if (!!isExpoCallback) {
+      return handleExpoSigninCallback(req, isExpoCallback.value);
+    }
   }
 
   // Every other request just calls the default handler
