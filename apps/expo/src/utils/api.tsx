@@ -30,16 +30,14 @@ export const trpc = createTRPCOptionsProxy<AppRouter>({
       httpBatchLink({
         transformer: superjson,
         url: `${getBaseUrl()}/api/trpc`,
-        async headers() {
+        headers() {
           const headers = new Map<string, string>();
           headers.set("x-trpc-source", "expo-react");
 
-          try {
-            const token = await getToken();
-            if (token) headers.set("Authorization", `Bearer ${token}`);
-          } catch (e) {
-            console.warn("[API] Failed to get session token:", e);
-          }
+          // getToken() reads from in-memory cache (set up by initializeToken())
+          // This is synchronous — no async issues with httpBatchLink
+          const token = getToken();
+          if (token) headers.set("Authorization", `Bearer ${token}`);
 
           return Object.fromEntries(headers);
         },

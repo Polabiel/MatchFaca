@@ -54,3 +54,6 @@ dist/
 # docker
 docker-data/
 
+# env files with secrets (local overrides)
+.env.local
+.env.*.local
