@@ -65,8 +65,8 @@ export function SwipeFeed() {
         )}
 
         <SwipeCard
-          key={currentProfile!.userId}
-          profile={currentProfile!}
+          key={currentProfile.userId}
+          profile={currentProfile}
           onSkip={handleSkip}
           onChallenge={handleChallenge}
         />

@@ -1,12 +1,11 @@
 import { Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { FlashList } from "@shopify/flash-list";
 import { Stack } from "expo-router";
+import { FlashList } from "@shopify/flash-list";
 import { useQuery } from "@tanstack/react-query";
 
 import type { RouterOutputs } from "~/utils/api";
 import { trpc } from "~/utils/api";
-
 import { NavBar } from "./_components/nav-bar";
 
 type Match = RouterOutputs["fightRequest"]["matches"][number];
@@ -34,7 +33,7 @@ function MatchCard({ match }: { match: Match }) {
   const challengedName = match.challenged.name ?? "Desconhecido";
   const fight = match.fight;
   const statusLabel = fight
-    ? fightStatusLabels[fight.status] ?? fight.status
+    ? (fightStatusLabels[fight.status] ?? fight.status)
     : "Aguardando agendamento";
 
   return (
@@ -48,7 +47,10 @@ function MatchCard({ match }: { match: Match }) {
                 {challengerName.charAt(0).toUpperCase()}
               </Text>
             </View>
-            <Text className="mt-1 text-sm font-semibold text-white text-center" numberOfLines={1}>
+            <Text
+              className="mt-1 text-center text-sm font-semibold text-white"
+              numberOfLines={1}
+            >
               {challengerName}
             </Text>
           </View>
@@ -64,7 +66,10 @@ function MatchCard({ match }: { match: Match }) {
                 {challengedName.charAt(0).toUpperCase()}
               </Text>
             </View>
-            <Text className="mt-1 text-sm font-semibold text-white text-center" numberOfLines={1}>
+            <Text
+              className="mt-1 text-center text-sm font-semibold text-white"
+              numberOfLines={1}
+            >
               {challengedName}
             </Text>
           </View>

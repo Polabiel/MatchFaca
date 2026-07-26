@@ -1,4 +1,5 @@
 import { Image, Pressable, Text, View } from "react-native";
+
 import type { RouterOutputs } from "~/utils/api";
 
 type NearbyProfile = RouterOutputs["profile"]["nearby"][number];
@@ -47,7 +48,7 @@ export function SwipeCard({
           />
         ) : (
           <View className="items-center justify-center">
-            <View className="mb-2 h-20 w-20 rounded-full border-2 border-[#DC2626] bg-[#DC2626]/20 items-center justify-center">
+            <View className="mb-2 h-20 w-20 items-center justify-center rounded-full border-2 border-[#DC2626] bg-[#DC2626]/20">
               <Text className="text-4xl text-[#DC2626]">
                 {profile.nickname.charAt(0).toUpperCase()}
               </Text>

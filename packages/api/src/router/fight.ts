@@ -38,15 +38,14 @@ export const fightRouter = {
         where: eq(Fight.fightRequestId, input.fightRequestId),
       });
 
-      if (existingFight) throw new Error("Já existe uma luta agendada para esse pedido");
+      if (existingFight)
+        throw new Error("Já existe uma luta agendada para esse pedido");
 
       return ctx.db
         .insert(Fight)
         .values({
           fightRequestId: input.fightRequestId,
-          scheduledAt: input.scheduledAt
-            ? new Date(input.scheduledAt)
-            : null,
+          scheduledAt: input.scheduledAt ? new Date(input.scheduledAt) : null,
           locationName: input.locationName ?? null,
           latitude: input.latitude ?? null,
           longitude: input.longitude ?? null,
@@ -83,7 +82,8 @@ export const fightRouter = {
       });
 
       if (!fight) throw new Error("Luta não encontrada");
-      if (fight.status !== "scheduled") throw new Error("Luta não está agendada");
+      if (fight.status !== "scheduled")
+        throw new Error("Luta não está agendada");
 
       const isParticipant =
         fight.fightRequest.challengerId === ctx.session.user.id ||

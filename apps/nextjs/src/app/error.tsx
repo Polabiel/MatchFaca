@@ -1,7 +1,7 @@
 "use client";
 
 export default function ErrorPage({
-  error,
+  error: _error,
   reset,
 }: {
   error: Error & { digest?: string };
@@ -12,9 +12,7 @@ export default function ErrorPage({
       <div className="flex size-20 items-center justify-center rounded-full border-2 border-dashed border-red-500/30 text-4xl text-red-500/50">
         💀
       </div>
-      <h1 className="text-2xl font-bold text-foreground">
-        Algo deu errado
-      </h1>
+      <h1 className="text-2xl font-bold text-foreground">Algo deu errado</h1>
       <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
         O ringue inteiro sentiu isso. Tenta de novo.
       </p>

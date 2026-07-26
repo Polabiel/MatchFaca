@@ -1,10 +1,10 @@
+import type { AppRouter } from "@matchfaca/api";
 import type { TRPCQueryOptions } from "@trpc/tanstack-react-query";
 import { cache } from "react";
 import { headers } from "next/headers";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
 
-import type { AppRouter } from "@matchfaca/api";
 import { appRouter, createTRPCContext } from "@matchfaca/api";
 import { auth } from "@matchfaca/auth";
 

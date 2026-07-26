@@ -4,7 +4,6 @@ import {
   pgEnum,
   pgTable,
   primaryKey,
-  timestamp,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
@@ -135,21 +134,29 @@ export const Profile = pgTable(
     nickname: t.varchar({ length: 60 }).notNull(),
     photo: t.varchar({ length: 512 }),
     bio: t.text(),
-    fightingStyle: fightingStyleEnum("fighting_style").notNull().default("outro"),
+    fightingStyle: fightingStyleEnum("fighting_style")
+      .notNull()
+      .default("outro"),
     weightClass: weightClassEnum("weight_class"),
     wins: t.integer().notNull().default(0),
     losses: t.integer().notNull().default(0),
     latitude: t.doublePrecision(),
     longitude: t.doublePrecision(),
     locationName: t.varchar({ length: 255 }),
-    createdAt: t.timestamp({ mode: "date", withTimezone: true }).defaultNow().notNull(),
+    createdAt: t
+      .timestamp({ mode: "date", withTimezone: true })
+      .defaultNow()
+      .notNull(),
     updatedAt: t
       .timestamp({ mode: "date", withTimezone: true })
       .$onUpdateFn(() => sql`now()`),
   }),
   (table) => ({
     userIdIdx: uniqueIndex("profile_user_id_idx").on(table.userId),
-    locationIdx: index("profile_location_idx").on(table.latitude, table.longitude),
+    locationIdx: index("profile_location_idx").on(
+      table.latitude,
+      table.longitude,
+    ),
   }),
 );
 
@@ -188,7 +195,10 @@ export const FightRequest = pgTable(
       .references(() => User.id, { onDelete: "cascade" }),
     message: t.varchar({ length: 280 }),
     status: fightRequestStatusEnum("status").notNull().default("pending"),
-    createdAt: t.timestamp({ mode: "date", withTimezone: true }).defaultNow().notNull(),
+    createdAt: t
+      .timestamp({ mode: "date", withTimezone: true })
+      .defaultNow()
+      .notNull(),
     updatedAt: t
       .timestamp({ mode: "date", withTimezone: true })
       .$onUpdateFn(() => sql`now()`),
@@ -200,20 +210,23 @@ export const FightRequest = pgTable(
   }),
 );
 
-export const FightRequestRelations = relations(FightRequest, ({ one, many }) => ({
-  challenger: one(User, {
-    fields: [FightRequest.challengerId],
-    references: [User.id],
-    relationName: "challenger",
+export const FightRequestRelations = relations(
+  FightRequest,
+  ({ one, many }) => ({
+    challenger: one(User, {
+      fields: [FightRequest.challengerId],
+      references: [User.id],
+      relationName: "challenger",
+    }),
+    challenged: one(User, {
+      fields: [FightRequest.challengedId],
+      references: [User.id],
+      relationName: "challenged",
+    }),
+    messages: many(Message),
+    fight: one(Fight),
   }),
-  challenged: one(User, {
-    fields: [FightRequest.challengedId],
-    references: [User.id],
-    relationName: "challenged",
-  }),
-  messages: many(Message),
-  fight: one(Fight),
-}));
+);
 
 export const Fight = pgTable(
   "fight",
@@ -230,11 +243,16 @@ export const Fight = pgTable(
     winnerId: t.uuid().references(() => User.id),
     status: fightStatusEnum("status").notNull().default("scheduled"),
     result: fightResultEnum("result"),
-    createdAt: t.timestamp({ mode: "date", withTimezone: true }).defaultNow().notNull(),
+    createdAt: t
+      .timestamp({ mode: "date", withTimezone: true })
+      .defaultNow()
+      .notNull(),
     endedAt: t.timestamp({ mode: "date", withTimezone: true }),
   }),
   (table) => ({
-    fightRequestIdx: uniqueIndex("fight_fight_request_idx").on(table.fightRequestId),
+    fightRequestIdx: uniqueIndex("fight_fight_request_idx").on(
+      table.fightRequestId,
+    ),
     statusIdx: index("fight_status_idx").on(table.status),
   }),
 );
@@ -263,7 +281,10 @@ export const Message = pgTable(
       .notNull()
       .references(() => User.id, { onDelete: "cascade" }),
     content: t.text().notNull(),
-    createdAt: t.timestamp({ mode: "date", withTimezone: true }).defaultNow().notNull(),
+    createdAt: t
+      .timestamp({ mode: "date", withTimezone: true })
+      .defaultNow()
+      .notNull(),
   }),
   (table) => ({
     fightRequestIdx: index("msg_fight_request_idx").on(table.fightRequestId),

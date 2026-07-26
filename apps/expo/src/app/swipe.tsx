@@ -5,7 +5,6 @@ import { Stack } from "expo-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { trpc } from "~/utils/api";
-
 import { NavBar } from "./_components/nav-bar";
 import { SwipeCard } from "./_components/swipe-card";
 
@@ -22,9 +21,7 @@ export function SwipeFeed() {
   );
 
   const profiles = nearbyProfiles ?? [];
-  const visibleProfiles = profiles.filter(
-    (p) => !dismissedIds.includes(p.id),
-  );
+  const visibleProfiles = profiles.filter((p) => !dismissedIds.includes(p.id));
 
   const challengeMutation = useMutation(
     trpc.fightRequest.send.mutationOptions({
@@ -63,7 +60,7 @@ export function SwipeFeed() {
   if (!currentProfile) {
     return (
       <View className="flex-1 items-center justify-center bg-[#0D0D0D] px-8">
-        <Text className="text-6xl mb-4">🗡️</Text>
+        <Text className="mb-4 text-6xl">🗡️</Text>
         <Text className="text-center text-xl font-bold text-white">
           Ninguém por perto
         </Text>

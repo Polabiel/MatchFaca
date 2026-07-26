@@ -1,6 +1,6 @@
 import { authRouter } from "./router/auth";
-import { fightRequestRouter } from "./router/fight-request";
 import { fightRouter } from "./router/fight";
+import { fightRequestRouter } from "./router/fight-request";
 import { profileRouter } from "./router/profile";
 import { createTRPCRouter } from "./trpc";
 

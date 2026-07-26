@@ -6,7 +6,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { trpc } from "~/utils/api";
 import { useSignOut, useUser } from "~/utils/auth";
-
 import { NavBar } from "./_components/nav-bar";
 
 const fightingStyles = [
@@ -126,9 +125,7 @@ function ProfileForm({
 
       {/* Bio */}
       <View className="mb-4">
-        <Text className="mb-1 text-sm font-semibold text-gray-400">
-          Bio
-        </Text>
+        <Text className="mb-1 text-sm font-semibold text-gray-400">Bio</Text>
         <TextInput
           className="rounded-xl border border-[#DC2626]/30 bg-[#1A1A1A] px-4 py-3 text-base text-white"
           value={bio}

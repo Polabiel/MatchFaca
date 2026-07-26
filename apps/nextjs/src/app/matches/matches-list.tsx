@@ -1,5 +1,6 @@
 "use client";
 
+import type { RouterOutputs } from "@matchfaca/api";
 import { useState } from "react";
 import {
   useMutation,
@@ -7,7 +8,6 @@ import {
   useSuspenseQuery,
 } from "@tanstack/react-query";
 
-import type { RouterOutputs } from "@matchfaca/api";
 import { cn } from "@matchfaca/ui";
 import { Button } from "@matchfaca/ui/button";
 import { Input } from "@matchfaca/ui/input";
@@ -111,13 +111,18 @@ function ScheduleForm({
     e.preventDefault();
     schedule.mutate({
       fightRequestId: matchId,
-      scheduledAt: scheduledAt ? new Date(scheduledAt).toISOString() : undefined,
+      scheduledAt: scheduledAt
+        ? new Date(scheduledAt).toISOString()
+        : undefined,
       locationName: locationName || undefined,
     });
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3 border-t border-border pt-3">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-3 border-t border-border pt-3"
+    >
       <div>
         <label className="mb-1 block text-xs font-medium text-muted-foreground">
           Data e horário
@@ -164,9 +169,8 @@ function ScheduleForm({
 function MatchCard({ match }: { match: Match }) {
   const [showSchedule, setShowSchedule] = useState(false);
 
-  const isChallenger = match.challengerId === match.challenger?.id;
+  const isChallenger = match.challengerId === match.challenger.id;
   const opponent = isChallenger ? match.challenged : match.challenger;
-  const you = isChallenger ? match.challenger : match.challenged;
   const fight = match.fight;
 
   return (
@@ -174,20 +178,18 @@ function MatchCard({ match }: { match: Match }) {
       {/* Opponent info */}
       <div className="flex items-center gap-3">
         <Avatar
-          name={opponent?.name ?? "Desconhecido"}
-          image={opponent?.image}
+          name={opponent.name ?? "Desconhecido"}
+          image={opponent.image}
         />
 
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold text-foreground">
-            {opponent?.name ?? "Lutador desconhecido"}
+            {opponent.name ?? "Lutador desconhecido"}
           </p>
           <p className="truncate text-xs text-muted-foreground">
             Você{" "}
             {match.message && (
-              <span className="italic">
-                &ldquo;{match.message}&rdquo;
-              </span>
+              <span className="italic">&ldquo;{match.message}&rdquo;</span>
             )}
           </p>
         </div>
@@ -205,7 +207,8 @@ function MatchCard({ match }: { match: Match }) {
             <span
               className={cn(
                 "text-xs font-semibold",
-                FIGHT_STATUS_LABELS[fight.status]?.color ?? "text-muted-foreground",
+                FIGHT_STATUS_LABELS[fight.status]?.color ??
+                  "text-muted-foreground",
               )}
             >
               {FIGHT_STATUS_LABELS[fight.status]?.label ?? fight.status}
@@ -256,7 +259,7 @@ export function MatchesList() {
     trpc.fightRequest.matches.queryOptions(),
   );
 
-  if (!matches || matches.length === 0) {
+  if (matches.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-4 py-20 text-center">
         <div className="flex size-20 items-center justify-center rounded-full border-2 border-dashed border-muted-foreground/30 text-4xl text-muted-foreground/50">

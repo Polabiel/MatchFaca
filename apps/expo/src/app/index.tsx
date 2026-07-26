@@ -4,9 +4,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Stack } from "expo-router";
 
 import { useSignIn, useSignOut, useUser } from "~/utils/auth";
-
-import { SwipeFeed } from "./swipe";
 import { NavBar } from "./_components/nav-bar";
+import { SwipeFeed } from "./swipe";
 
 function AuthScreen() {
   const signIn = useSignIn();

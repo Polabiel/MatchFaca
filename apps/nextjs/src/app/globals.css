@@ -51,7 +51,11 @@
 
 @layer utilities {
   .bg-blood-gradient {
-    background: linear-gradient(135deg, hsl(0 72% 48% / 0.4), hsl(0 0% 4% / 0.9));
+    background: linear-gradient(
+      135deg,
+      hsl(0 72% 48% / 0.4),
+      hsl(0 0% 4% / 0.9)
+    );
   }
 
   .bg-card-overlay {
@@ -68,11 +72,15 @@
   }
 
   .glow-fire {
-    box-shadow: 0 0 24px hsl(0 100% 50% / 0.5), 0 0 48px hsl(25 100% 50% / 0.3);
+    box-shadow:
+      0 0 24px hsl(0 100% 50% / 0.5),
+      0 0 48px hsl(25 100% 50% / 0.3);
   }
 
   .glow-fire:hover {
-    box-shadow: 0 0 32px hsl(0 100% 50% / 0.6), 0 0 64px hsl(25 100% 50% / 0.4);
+    box-shadow:
+      0 0 32px hsl(0 100% 50% / 0.6),
+      0 0 64px hsl(25 100% 50% / 0.4);
   }
 
   .bg-noise {

@@ -1,5 +1,6 @@
 "use client";
 
+import type { RouterOutputs } from "@matchfaca/api";
 import { useState } from "react";
 import {
   useMutation,
@@ -8,8 +9,6 @@ import {
 } from "@tanstack/react-query";
 import { z } from "zod";
 
-import type { RouterOutputs } from "@matchfaca/api";
-import { cn } from "@matchfaca/ui";
 import { Button } from "@matchfaca/ui/button";
 import {
   Form,
@@ -50,21 +49,15 @@ const WEIGHT_OPTIONS = [
   { value: "acima_93kg", label: "Acima de 93kg" },
 ] as const;
 
-const fightingStyleValues = STYLE_OPTIONS.map((o) => o.value) as [
-  string,
-  ...string[],
-];
-const weightClassValues = WEIGHT_OPTIONS.map((o) => o.value) as [
-  string,
-  ...string[],
-];
+const fightingStyleValues = STYLE_OPTIONS.map((o) => o.value);
+const weightClassValues = WEIGHT_OPTIONS.map((o) => o.value);
 
 const ProfileFormSchema = z.object({
   nickname: z.string().min(2, "Mínimo de 2 caracteres").max(60),
   bio: z.string().max(500).optional().or(z.literal("")),
-  fightingStyle: z.enum(fightingStyleValues as [string, ...string[]]),
+  fightingStyle: z.enum(fightingStyleValues),
   weightClass: z
-    .enum(weightClassValues as [string, ...string[]])
+    .enum(weightClassValues)
     .optional()
     .or(z.literal("")),
   latitude: z.number().min(-90).max(90).optional(),
@@ -102,8 +95,8 @@ function ProfileForm({
     defaultValues: {
       nickname: defaultValues?.nickname ?? "",
       bio: defaultValues?.bio ?? "",
-      fightingStyle: (defaultValues?.fightingStyle as ProfileFormValues["fightingStyle"]) ?? "outro",
-      weightClass: (defaultValues?.weightClass as ProfileFormValues["weightClass"]) ?? "",
+      fightingStyle: defaultValues?.fightingStyle ?? "outro",
+      weightClass: defaultValues?.weightClass ?? "",
       latitude: undefined,
       longitude: undefined,
       locationName: defaultValues?.locationName ?? "",
@@ -130,9 +123,9 @@ function ProfileForm({
           // Clean up empty strings to undefined for optional fields
           const payload = {
             ...data,
-            bio: data.bio || undefined,
-            weightClass: data.weightClass || undefined,
-            locationName: data.locationName || undefined,
+            bio: data.bio ?? undefined,
+            weightClass: data.weightClass ?? undefined,
+            locationName: data.locationName ?? undefined,
             latitude: data.latitude ?? undefined,
             longitude: data.longitude ?? undefined,
           };
@@ -194,9 +187,7 @@ function ProfileForm({
               <FormControl>
                 <select
                   value={field.value ?? ""}
-                  onChange={(e) =>
-                    field.onChange(e.target.value || "")
-                  }
+                  onChange={(e) => field.onChange(e.target.value || "")}
                   className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 >
                   <option value="">Selecionar...</option>
@@ -274,8 +265,8 @@ function ProfileCard({
   profile: NonNullable<MyProfile>;
   onEdit: () => void;
 }) {
-  const wins = profile.wins ?? 0;
-  const losses = profile.losses ?? 0;
+  const wins = profile.wins;
+  const losses = profile.losses;
   const total = wins + losses;
 
   const styleLabel =
@@ -283,8 +274,8 @@ function ProfileCard({
     profile.fightingStyle;
 
   const weightLabel = profile.weightClass
-    ? WEIGHT_OPTIONS.find((w) => w.value === profile.weightClass)?.label ??
-      profile.weightClass
+    ? (WEIGHT_OPTIONS.find((w) => w.value === profile.weightClass)?.label ??
+      profile.weightClass)
     : null;
 
   return (
@@ -372,9 +363,7 @@ function ProfileCard({
 
 export function ProfileView() {
   const trpc = useTRPC();
-  const { data: profile } = useSuspenseQuery(
-    trpc.profile.mine.queryOptions(),
-  );
+  const { data: profile } = useSuspenseQuery(trpc.profile.mine.queryOptions());
 
   const [editing, setEditing] = useState(false);
 

@@ -60,7 +60,8 @@ export const profileRouter = {
       // Haversine-based proximity filter
       // Approx: 1° lat = 111km, 1° lng = 111*cos(lat) km
       const latDelta = input.radiusKm / 111;
-      const lngDelta = input.radiusKm / (111 * Math.cos((input.latitude * Math.PI) / 180));
+      const lngDelta =
+        input.radiusKm / (111 * Math.cos((input.latitude * Math.PI) / 180));
 
       const conditions = [
         isNotNull(Profile.latitude),
@@ -71,7 +72,12 @@ export const profileRouter = {
       ];
 
       if (input.excludeIds?.length) {
-        conditions.push(sql`${Profile.userId} NOT IN (${sql.join(input.excludeIds.map((id) => sql`${id}::uuid`), sql`, `)})`);
+        conditions.push(
+          sql`${Profile.userId} NOT IN (${sql.join(
+            input.excludeIds.map((id) => sql`${id}::uuid`),
+            sql`, `,
+          )})`,
+        );
       }
 
       return ctx.db.query.Profile.findMany({

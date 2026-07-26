@@ -1,9 +1,9 @@
 "use client";
 
+import type { RouterOutputs } from "@matchfaca/api";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import type { RouterOutputs } from "@matchfaca/api";
 import { cn } from "@matchfaca/ui";
 import { toast } from "@matchfaca/ui/toast";
 
@@ -99,11 +99,11 @@ export function SwipeCard({
   };
 
   const nickname = profile.nickname;
-  const userName = profile.user?.name ?? nickname;
-  const wins = profile.wins ?? 0;
-  const losses = profile.losses ?? 0;
+  const wins = profile.wins;
+  const losses = profile.losses;
   const totalFights = wins + losses;
-  const winRate = totalFights > 0 ? Math.round((wins / totalFights) * 100) : null;
+  const winRate =
+    totalFights > 0 ? Math.round((wins / totalFights) * 100) : null;
 
   const hasPhoto = !!profile.photo && !imageError;
 
@@ -124,7 +124,7 @@ export function SwipeCard({
       {/* Background */}
       {hasPhoto ? (
         <img
-          src={profile.photo!}
+          src={profile.photo}
           alt={nickname}
           className="absolute inset-0 size-full object-cover"
           onError={() => setImageError(true)}
@@ -134,10 +134,10 @@ export function SwipeCard({
       )}
 
       {/* Noise overlay */}
-      <div className="absolute inset-0 bg-noise" />
+      <div className="bg-noise absolute inset-0" />
 
       {/* Gradient overlay for text readability */}
-      <div className="absolute inset-0 bg-card-overlay" />
+      <div className="bg-card-overlay absolute inset-0" />
 
       {/* Content */}
       <div className="relative flex h-full flex-col justify-end p-5">
@@ -235,7 +235,7 @@ export function SwipeCardSkeleton() {
       style={{ aspectRatio: "3 / 4" }}
     >
       <div className="absolute inset-0 bg-zinc-800/50" />
-      <div className="absolute inset-0 bg-card-overlay" />
+      <div className="bg-card-overlay absolute inset-0" />
       <div className="relative flex h-full flex-col justify-end p-5">
         <div className="absolute right-4 top-4 h-6 w-24 rounded-full bg-zinc-700/50" />
         <div className="mb-2 h-8 w-3/5 rounded bg-zinc-700/50" />
