@@ -65,9 +65,7 @@ export function NavBar() {
     <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/95 backdrop-blur-xl">
       <div className="mx-auto flex max-w-lg items-center justify-around px-4 py-2">
         {navItems.map(({ href, label, Icon }) => {
-          const isActive =
-            pathname != null &&
-            (pathname === href || pathname.startsWith(href + "/"));
+          const isActive = pathname === href || pathname.startsWith(href + "/");
 
           return (
             <Link
