@@ -99,7 +99,5 @@ jobs:
         run: cp .env.example .env
       - name: Setup EAS
         run: pnpm add -g eas-cli
-      - name: Init EAS Project
-        run: cd apps/expo && eas init --non-interactive 2>&1 || echo "EAS project already exists or init skipped"
       - name: EAS Preview Build
-        run: cd apps/expo && eas build --platform all --profile preview --non-interactive 2>&1 || echo "EAS build skipped (project may need local init)"
+        run: cd apps/expo && eas build --platform all --profile preview --non-interactive

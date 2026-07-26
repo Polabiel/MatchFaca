@@ -2,8 +2,8 @@ import type { ConfigContext, ExpoConfig } from "expo/config";
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
-  name: "expo",
-  slug: "expo",
+  name: "MatchFaca",
+  slug: "matchfaca",
   scheme: "expo",
   version: "0.1.0",
   orientation: "portrait",
@@ -30,11 +30,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     },
     edgeToEdgeEnabled: true,
   },
-  // extra: {
-  //   eas: {
-  //     projectId: "your-eas-project-id",
-  //   },
-  // },
+  extra: {
+    eas: {
+      projectId: "a190c2a9-9b8d-4935-b101-cdc34e7161bc",
+    },
+  },
   experiments: {
     tsconfigPaths: true,
     typedRoutes: true,
