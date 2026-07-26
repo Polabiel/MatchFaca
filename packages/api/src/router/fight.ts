@@ -1,9 +1,6 @@
 import type { TRPCRouterRecord } from "@trpc/server";
 import { z } from "zod";
 
-import { and, eq, or } from "@matchfaca/db";
-import { Fight, FightRequest } from "@matchfaca/db/schema";
-
 import { protectedProcedure } from "../trpc";
 
 export const fightRouter = {
@@ -19,11 +16,11 @@ export const fightRouter = {
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const request = await ctx.db.query.FightRequest.findFirst({
-        where: and(
-          eq(FightRequest.id, input.fightRequestId),
-          eq(FightRequest.status, "accepted"),
-        ),
+      const request = await ctx.db.fightRequest.findFirst({
+        where: {
+          id: input.fightRequestId,
+          status: "accepted",
+        },
       });
 
       if (!request) throw new Error("Pedido não encontrado ou não aceito");
@@ -34,41 +31,40 @@ export const fightRouter = {
 
       if (!isParticipant) throw new Error("Você não faz parte desse pedido");
 
-      const existingFight = await ctx.db.query.Fight.findFirst({
-        where: eq(Fight.fightRequestId, input.fightRequestId),
+      const existingFight = await ctx.db.fight.findFirst({
+        where: { fightRequestId: input.fightRequestId },
       });
 
       if (existingFight)
         throw new Error("Já existe uma luta agendada para esse pedido");
 
-      return ctx.db
-        .insert(Fight)
-        .values({
+      return ctx.db.fight.create({
+        data: {
           fightRequestId: input.fightRequestId,
           scheduledAt: input.scheduledAt ? new Date(input.scheduledAt) : null,
           locationName: input.locationName ?? null,
           latitude: input.latitude ?? null,
           longitude: input.longitude ?? null,
-        })
-        .returning();
+        },
+      });
     }),
 
   /** Get my fights */
   mine: protectedProcedure.query(({ ctx }) => {
-    return ctx.db.query.FightRequest.findMany({
-      where: and(
-        or(
-          eq(FightRequest.challengerId, ctx.session.user.id),
-          eq(FightRequest.challengedId, ctx.session.user.id),
-        ),
-        eq(FightRequest.status, "accepted"),
-      ),
-      with: {
+    return ctx.db.fightRequest.findMany({
+      where: {
+        OR: [
+          { challengerId: ctx.session.user.id },
+          { challengedId: ctx.session.user.id },
+        ],
+        status: "accepted",
+      },
+      include: {
         fight: true,
         challenger: true,
         challenged: true,
       },
-      limit: 50,
+      take: 50,
     });
   }),
 
@@ -76,9 +72,9 @@ export const fightRouter = {
   confirm: protectedProcedure
     .input(z.object({ id: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
-      const fight = await ctx.db.query.Fight.findFirst({
-        where: eq(Fight.id, input.id),
-        with: { fightRequest: true },
+      const fight = await ctx.db.fight.findFirst({
+        where: { id: input.id },
+        include: { fightRequest: true },
       });
 
       if (!fight) throw new Error("Luta não encontrada");
@@ -91,11 +87,10 @@ export const fightRouter = {
 
       if (!isParticipant) throw new Error("Você não faz parte dessa luta");
 
-      return ctx.db
-        .update(Fight)
-        .set({ status: "confirmed" })
-        .where(eq(Fight.id, input.id))
-        .returning();
+      return ctx.db.fight.update({
+        where: { id: input.id },
+        data: { status: "confirmed" },
+      });
     }),
 
   /** Report result */
@@ -115,9 +110,9 @@ export const fightRouter = {
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const fight = await ctx.db.query.Fight.findFirst({
-        where: eq(Fight.id, input.id),
-        with: { fightRequest: true },
+      const fight = await ctx.db.fight.findFirst({
+        where: { id: input.id },
+        include: { fightRequest: true },
       });
 
       if (!fight) throw new Error("Luta não encontrada");
@@ -128,25 +123,24 @@ export const fightRouter = {
 
       if (!isParticipant) throw new Error("Você não faz parte dessa luta");
 
-      return ctx.db
-        .update(Fight)
-        .set({
+      return ctx.db.fight.update({
+        where: { id: input.id },
+        data: {
           status: "completed",
           winnerId: input.winnerId,
           result: input.result,
           endedAt: new Date(),
-        })
-        .where(eq(Fight.id, input.id))
-        .returning();
+        },
+      });
     }),
 
   /** Cancel a fight */
   cancel: protectedProcedure
     .input(z.object({ id: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
-      const fight = await ctx.db.query.Fight.findFirst({
-        where: eq(Fight.id, input.id),
-        with: { fightRequest: true },
+      const fight = await ctx.db.fight.findFirst({
+        where: { id: input.id },
+        include: { fightRequest: true },
       });
 
       if (!fight) throw new Error("Luta não encontrada");
@@ -157,10 +151,9 @@ export const fightRouter = {
 
       if (!isParticipant) throw new Error("Você não faz parte dessa luta");
 
-      return ctx.db
-        .update(Fight)
-        .set({ status: "cancelled" })
-        .where(eq(Fight.id, input.id))
-        .returning();
+      return ctx.db.fight.update({
+        where: { id: input.id },
+        data: { status: "cancelled" },
+      });
     }),
 } satisfies TRPCRouterRecord;

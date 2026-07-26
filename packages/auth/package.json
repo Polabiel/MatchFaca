@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@auth/core": "catalog:",
-    "@auth/drizzle-adapter": "catalog:",
+    "@auth/prisma-adapter": "catalog:",
     "@matchfaca/db": "workspace:*",
     "@t3-oss/env-nextjs": "^0.13.4",
     "next": "^15.3.1",

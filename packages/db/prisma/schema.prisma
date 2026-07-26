@@ -1,0 +1,183 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+}
+
+// ─── Enums ──────────────────────────────────────────────
+
+enum FightingStyle {
+  boxe
+  muay_thai
+  jiu_jitsu
+  mma
+  kickboxing
+  capoeira
+  karate
+  judô
+  taekwondo
+  luta_livre
+  vale_tudo
+  porrada_limpa
+  outro
+}
+
+enum WeightClass {
+  até_66kg
+  até_77kg
+  até_93kg
+  acima_93kg
+}
+
+enum FightRequestStatus {
+  pending
+  accepted
+  declined
+}
+
+enum FightStatus {
+  scheduled
+  confirmed
+  in_progress
+  completed
+  cancelled
+}
+
+enum FightResult {
+  knockout
+  submission
+  desistência
+  empate
+  nocaute_técnico
+  finalizado
+}
+
+// ─── Auth tables (NextAuth / Auth.js) ──────────────────
+
+model User {
+  id            String    @id @default(uuid()) @db.Uuid
+  name          String?   @db.VarChar(255)
+  email         String    @unique @db.VarChar(255)
+  emailVerified DateTime? @db.Timestamptz
+  image         String?   @db.VarChar(255)
+
+  accounts         Account[]
+  sessions         Session[]
+  profile          Profile?
+  sentRequests     FightRequest[] @relation("Challenger")
+  receivedRequests FightRequest[] @relation("Challenged")
+  fights           Fight[]
+  messages         Message[]
+
+  @@map("user")
+}
+
+model Account {
+  userId            String @db.Uuid
+  type              String @db.VarChar(255)
+  provider          String @db.VarChar(255)
+  providerAccountId String @db.VarChar(255)
+  refresh_token     String? @db.VarChar(255)
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String? @db.VarChar(255)
+  scope             String? @db.VarChar(255)
+  id_token          String? @db.Text
+  session_state     String? @db.VarChar(255)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+  @@map("account")
+}
+
+model Session {
+  sessionToken String   @id @db.VarChar(255)
+  userId       String   @db.Uuid
+  expires      DateTime @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+// ─── matchFaca tables ──────────────────────────────────
+
+model Profile {
+  id            String        @id @default(uuid()) @db.Uuid
+  userId        String        @unique @db.Uuid
+  nickname      String        @db.VarChar(60)
+  photo         String?       @db.VarChar(512)
+  bio           String?       @db.Text
+  fightingStyle FightingStyle @map("fighting_style")
+  weightClass   WeightClass?  @map("weight_class")
+  wins          Int           @default(0)
+  losses        Int           @default(0)
+  latitude      Float?
+  longitude     Float?
+  locationName  String?       @db.VarChar(255) @map("location_name")
+  createdAt     DateTime      @default(now()) @db.Timestamptz @map("created_at")
+  updatedAt     DateTime?     @updatedAt @db.Timestamptz @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([latitude, longitude], name: "profile_location_idx")
+  @@map("profile")
+}
+
+model FightRequest {
+  id            String             @id @default(uuid()) @db.Uuid
+  challengerId  String             @db.Uuid @map("challenger_id")
+  challengedId  String             @db.Uuid @map("challenged_id")
+  message       String?            @db.VarChar(280)
+  status        FightRequestStatus @default(pending)
+  createdAt     DateTime           @default(now()) @db.Timestamptz @map("created_at")
+  updatedAt     DateTime?          @updatedAt @db.Timestamptz @map("updated_at")
+
+  challenger User  @relation("Challenger", fields: [challengerId], references: [id], onDelete: Cascade)
+  challenged User  @relation("Challenged", fields: [challengedId], references: [id], onDelete: Cascade)
+  messages   Message[]
+  fight      Fight?
+
+  @@index([challengerId], name: "fr_challenger_idx")
+  @@index([challengedId], name: "fr_challenged_idx")
+  @@index([status], name: "fr_status_idx")
+  @@map("fight_request")
+}
+
+model Fight {
+  id             String      @id @default(uuid()) @db.Uuid
+  fightRequestId String      @unique @db.Uuid @map("fight_request_id")
+  scheduledAt    DateTime?   @db.Timestamptz @map("scheduled_at")
+  locationName   String?     @db.VarChar(255) @map("location_name")
+  latitude       Float?
+  longitude      Float?
+  winnerId       String?     @db.Uuid @map("winner_id")
+  status         FightStatus @default(scheduled)
+  result         FightResult?
+  createdAt      DateTime    @default(now()) @db.Timestamptz @map("created_at")
+  endedAt        DateTime?   @db.Timestamptz @map("ended_at")
+
+  fightRequest FightRequest @relation(fields: [fightRequestId], references: [id], onDelete: Cascade)
+  winner       User?        @relation(fields: [winnerId], references: [id])
+
+  @@index([status], name: "fight_status_idx")
+  @@map("fight")
+}
+
+model Message {
+  id             String   @id @default(uuid()) @db.Uuid
+  fightRequestId String   @db.Uuid @map("fight_request_id")
+  senderId       String   @db.Uuid @map("sender_id")
+  content        String   @db.Text
+  createdAt      DateTime @default(now()) @db.Timestamptz @map("created_at")
+
+  fightRequest FightRequest @relation(fields: [fightRequestId], references: [id], onDelete: Cascade)
+  sender       User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([fightRequestId], name: "msg_fight_request_idx")
+  @@map("message")
+}

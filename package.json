@@ -12,6 +12,7 @@
     "clean:workspaces": "turbo run clean",
     "db:push": "turbo -F @matchfaca/db push",
     "db:studio": "turbo -F @matchfaca/db studio",
+    "db:generate": "turbo -F @matchfaca/db postinstall",
     "dev": "turbo watch dev --continue",
     "dev:next": "turbo watch dev -F @matchfaca/nextjs...",
     "format": "turbo run format --continue -- --cache --cache-location .cache/.prettiercache",

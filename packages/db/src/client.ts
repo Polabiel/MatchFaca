@@ -1,10 +1,3 @@
-import { sql } from "@vercel/postgres";
-import { drizzle } from "drizzle-orm/vercel-postgres";
+import { PrismaClient } from "@prisma/client";
 
-import * as schema from "./schema";
-
-export const db = drizzle({
-  client: sql,
-  schema,
-  casing: "snake_case",
-});
+export const db = new PrismaClient();

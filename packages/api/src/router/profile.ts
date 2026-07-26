@@ -1,16 +1,15 @@
 import type { TRPCRouterRecord } from "@trpc/server";
 import { z } from "zod";
 
-import { and, eq, isNotNull, ne, sql } from "@matchfaca/db";
-import { CreateProfileSchema, Profile } from "@matchfaca/db/schema";
+import { CreateProfileSchema } from "@matchfaca/db/schema";
 
 import { protectedProcedure, publicProcedure } from "../trpc";
 
 export const profileRouter = {
   /** Get the current user's profile */
   mine: protectedProcedure.query(({ ctx }) => {
-    return ctx.db.query.Profile.findFirst({
-      where: eq(Profile.userId, ctx.session.user.id),
+    return ctx.db.profile.findFirst({
+      where: { userId: ctx.session.user.id },
     });
   }),
 
@@ -18,8 +17,8 @@ export const profileRouter = {
   byUserId: publicProcedure
     .input(z.object({ userId: z.string().uuid() }))
     .query(({ ctx, input }) => {
-      return ctx.db.query.Profile.findFirst({
-        where: eq(Profile.userId, input.userId),
+      return ctx.db.profile.findFirst({
+        where: { userId: input.userId },
       });
     }),
 
@@ -27,22 +26,20 @@ export const profileRouter = {
   upsert: protectedProcedure
     .input(CreateProfileSchema)
     .mutation(async ({ ctx, input }) => {
-      const existing = await ctx.db.query.Profile.findFirst({
-        where: eq(Profile.userId, ctx.session.user.id),
+      const existing = await ctx.db.profile.findFirst({
+        where: { userId: ctx.session.user.id },
       });
 
       if (existing) {
-        return ctx.db
-          .update(Profile)
-          .set({ ...input, updatedAt: sql`now()` })
-          .where(eq(Profile.userId, ctx.session.user.id))
-          .returning();
+        return ctx.db.profile.update({
+          where: { userId: ctx.session.user.id },
+          data: { ...input },
+        });
       }
 
-      return ctx.db
-        .insert(Profile)
-        .values({ ...input, userId: ctx.session.user.id })
-        .returning();
+      return ctx.db.profile.create({
+        data: { ...input, userId: ctx.session.user.id },
+      });
     }),
 
   /** Get nearby profiles for the swipe feed */
@@ -63,27 +60,31 @@ export const profileRouter = {
       const lngDelta =
         input.radiusKm / (111 * Math.cos((input.latitude * Math.PI) / 180));
 
-      const conditions = [
-        isNotNull(Profile.latitude),
-        isNotNull(Profile.longitude),
-        ne(Profile.userId, ctx.session.user.id),
-        sql`${Profile.latitude} BETWEEN ${input.latitude - latDelta} AND ${input.latitude + latDelta}`,
-        sql`${Profile.longitude} BETWEEN ${input.longitude - lngDelta} AND ${input.longitude + lngDelta}`,
-      ];
-
-      if (input.excludeIds?.length) {
-        conditions.push(
-          sql`${Profile.userId} NOT IN (${sql.join(
-            input.excludeIds.map((id) => sql`${id}::uuid`),
-            sql`, `,
-          )})`,
-        );
-      }
-
-      return ctx.db.query.Profile.findMany({
-        where: and(...conditions),
-        limit: input.limit,
-        with: {
+      return ctx.db.profile.findMany({
+        where: {
+          AND: [
+            { latitude: { not: null } },
+            { longitude: { not: null } },
+            { userId: { not: ctx.session.user.id } },
+            {
+              latitude: {
+                gte: input.latitude - latDelta,
+                lte: input.latitude + latDelta,
+              },
+            },
+            {
+              longitude: {
+                gte: input.longitude - lngDelta,
+                lte: input.longitude + lngDelta,
+              },
+            },
+            ...(input.excludeIds?.length
+              ? [{ userId: { notIn: input.excludeIds } }]
+              : []),
+          ],
+        },
+        take: input.limit,
+        include: {
           user: true,
         },
       });
