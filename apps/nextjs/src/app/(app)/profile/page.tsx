@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 
 import { HydrateClient, prefetch, trpc } from "~/trpc/server";
-import { AuthShowcase } from "../_components/auth-showcase";
+import { AuthShowcase } from "../../_components/auth-showcase";
 import { ProfileView } from "./profile-view";
 
 export default function ProfilePage() {

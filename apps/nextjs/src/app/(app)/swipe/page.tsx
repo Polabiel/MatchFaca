@@ -1,12 +1,14 @@
 import { Suspense } from "react";
+import { redirect } from "next/navigation";
 
 import { auth } from "@matchfaca/auth";
+import { db } from "@matchfaca/db/client";
 import { HydrateClient, prefetch, trpc } from "~/trpc/server";
-import { AuthRequired } from "../_components/auth-required";
-import { AuthShowcase } from "../_components/auth-showcase";
-import { MatchesList } from "./matches-list";
+import { AuthRequired } from "../../_components/auth-required";
+import { AuthShowcase } from "../../_components/auth-showcase";
+import { SwipeFeed } from "./swipe-feed";
 
-export default async function MatchesPage() {
+export default async function SwipePage() {
   const session = await auth();
 
   if (!session?.user) {
@@ -16,10 +18,10 @@ export default async function MatchesPage() {
           <div className="flex items-center justify-between px-4 py-3">
             <div>
               <h1 className="text-base font-bold tracking-tight text-foreground">
-                <span className="text-primary">Lutas</span> Marcadas
+                match<span className="text-primary">Faca</span>
               </h1>
               <p className="text-xs text-muted-foreground">
-                Seus confrontos confirmados
+                Encontros que escalam
               </p>
             </div>
             <AuthShowcase />
@@ -27,16 +29,32 @@ export default async function MatchesPage() {
         </header>
         <main className="px-4 pb-6 pt-4">
           <AuthRequired
-            icon="⚔️"
-            title="Faça login para ver suas lutas"
-            description='Use o botão "Entrar" no topo da página para se autenticar e acompanhar seus confrontos.'
+            icon="👊"
+            title="Faça login para começar"
+            description='Use o botão "Entrar" no topo da página para se autenticar e encontrar lutadores na sua região.'
           />
         </main>
       </div>
     );
   }
 
-  prefetch(trpc.fightRequest.matches.queryOptions());
+  // Verifica se o perfil já foi criado (onboarding completo)
+  const profile = await db.profile.findFirst({
+    where: { userId: session.user.id },
+    select: { id: true },
+  });
+
+  if (!profile) {
+    redirect("/onboarding");
+  }
+
+  prefetch(
+    trpc.profile.nearby.queryOptions({
+      latitude: -23.5505,
+      longitude: -46.6333,
+      radiusKm: 100,
+    }),
+  );
 
   return (
     <HydrateClient>
@@ -46,30 +64,29 @@ export default async function MatchesPage() {
           <div className="flex items-center justify-between px-4 py-3">
             <div>
               <h1 className="text-base font-bold tracking-tight text-foreground">
-                <span className="text-primary">Lutas</span> Marcadas
+                match<span className="text-primary">Faca</span>
               </h1>
               <p className="text-xs text-muted-foreground">
-                Seus confrontos confirmados
+                Encontros que escalam
               </p>
             </div>
             <AuthShowcase />
           </div>
         </header>
 
+        {/* Swipe content */}
         <main className="px-4 pb-6 pt-4">
           <Suspense
             fallback={
-              <div className="space-y-4">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="h-32 animate-pulse rounded-xl border border-border/50 bg-muted/30"
-                  />
-                ))}
+              <div className="flex flex-col items-center gap-4">
+                <div className="skeleton-card w-full max-w-sm animate-pulse rounded-2xl border border-border/50 bg-muted/30" />
+                <p className="text-sm text-muted-foreground">
+                  Carregando lutadores...
+                </p>
               </div>
             }
           >
-            <MatchesList />
+            <SwipeFeed />
           </Suspense>
         </main>
       </div>

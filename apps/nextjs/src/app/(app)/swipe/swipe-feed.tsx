@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { useTRPC } from "~/trpc/react";
-import { SwipeCard, SwipeCardSkeleton } from "../_components/swipe-card";
+import { SwipeCard, SwipeCardSkeleton } from "../../_components/swipe-card";
 
 export function SwipeFeed() {
   const trpc = useTRPC();

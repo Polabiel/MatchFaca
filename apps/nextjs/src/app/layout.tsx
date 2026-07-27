@@ -6,7 +6,6 @@ import { cn } from "@matchfaca/ui";
 import { Toaster } from "@matchfaca/ui/toast";
 
 import { TRPCReactProvider } from "~/trpc/react";
-import { NavBar } from "./_components/nav-bar";
 
 import "~/app/globals.css";
 
@@ -48,10 +47,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         )}
       >
         <TRPCReactProvider>
-          <div className="relative mx-auto max-w-lg pb-20">
-            {props.children}
-          </div>
-          <NavBar />
+          {props.children}
         </TRPCReactProvider>
         <Toaster />
       </body>
