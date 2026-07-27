@@ -1,13 +1,12 @@
+import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import NextAuth from "next-auth";
 import Discord from "next-auth/providers/discord";
 
-import type { NextRequest } from "next/server";
-
 // Middleware only checks JWT — no Prisma adapter needed (edge-compatible)
 const { auth: nextAuthMiddleware } = NextAuth({ providers: [Discord] });
 
-export default nextAuthMiddleware(async function middleware(req: NextRequest) {
+export default nextAuthMiddleware(function middleware(_req: NextRequest) {
   const res = NextResponse.next();
 
   // Security headers
@@ -15,10 +14,7 @@ export default nextAuthMiddleware(async function middleware(req: NextRequest) {
   headers.set("X-Content-Type-Options", "nosniff");
   headers.set("X-Frame-Options", "DENY");
   headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-  headers.set(
-    "Permissions-Policy",
-    "geolocation=(), microphone=(), camera=()",
-  );
+  headers.set("Permissions-Policy", "geolocation=(), microphone=(), camera=()");
 
   return res;
 });

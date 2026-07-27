@@ -1,4 +1,4 @@
-import { writeFileSync, readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import type {
   DefaultSession,
   NextAuthConfig,
@@ -46,7 +46,9 @@ function writeAuthError(error: unknown) {
   });
   try {
     writeFileSync(AUTH_ERROR_PATH, entry, "utf-8");
-  } catch {}
+  } catch {
+    // Best-effort: auth error debug file is non-critical
+  }
 }
 
 export function readLastAuthError(): Record<string, unknown> | null {

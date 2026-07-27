@@ -13,15 +13,21 @@ const AUTH_COOKIE_PATTERN = /authjs\.session-token=([^;]+)/;
  *
  * Entries expire after 10 minutes.
  */
-const expoRedirectStore = new Map<string, { redirectTo: string; expiresAt: number }>();
+const expoRedirectStore = new Map<
+  string,
+  { redirectTo: string; expiresAt: number }
+>();
 
 if (typeof setInterval !== "undefined") {
-  setInterval(() => {
-    const now = Date.now();
-    for (const [key, val] of expoRedirectStore) {
-      if (val.expiresAt < now) expoRedirectStore.delete(key);
-    }
-  }, 5 * 60 * 1000);
+  setInterval(
+    () => {
+      const now = Date.now();
+      for (const [key, val] of expoRedirectStore) {
+        if (val.expiresAt < now) expoRedirectStore.delete(key);
+      }
+    },
+    5 * 60 * 1000,
+  );
 }
 
 /**
@@ -126,15 +132,15 @@ export const GET = async (
   // This runs BEFORE the POST; we use it to re-set the cookie if needed
   if (nextauthAction === "callback") {
     // Primary path: cookie survived (set in signin step)
-    if (!!isExpoCallback) {
+    if (isExpoCallback) {
       return handleExpoSigninCallback(req, isExpoCallback.value);
     }
 
     // Fallback: cookie was lost, try to recover from in-memory store
     const expoState = req.nextUrl.searchParams.get("expo_state");
-    if (expoState && expoRedirectStore.has(expoState)) {
-      const entry = expoRedirectStore.get(expoState)!;
-      if (entry.expiresAt > Date.now()) {
+    if (expoState) {
+      const entry = expoRedirectStore.get(expoState);
+      if (entry && entry.expiresAt > Date.now()) {
         // Re-set the cookie so the POST handler can find it
         (await cookies()).set({
           name: EXPO_COOKIE_NAME,
@@ -147,7 +153,7 @@ export const GET = async (
       expoRedirectStore.delete(expoState);
     }
 
-    if (!!isExpoCallback) {
+    if (isExpoCallback) {
       return handleExpoSigninCallback(req, isExpoCallback.value);
     }
   }

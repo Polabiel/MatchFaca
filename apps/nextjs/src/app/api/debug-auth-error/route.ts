@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
  * Use: GET /api/debug-auth-error
  * Returns: The last auth error object, or 200 with "No auth error recorded"
  */
-export async function GET() {
+export function GET() {
   const error = readLastAuthError();
 
   if (!error) {

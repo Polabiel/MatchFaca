@@ -1,12 +1,11 @@
+import type { AppStateStatus } from "react-native";
 import { useEffect, useState } from "react";
-import { AppState, type AppStateStatus } from "react-native";
-import { Stack } from "expo-router";
+import { AppState } from "react-native";
+import { SplashScreen, Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useQueryClient } from "@tanstack/react-query";
-import { SplashScreen } from "expo-router";
 
-import { queryClient } from "~/utils/api";
-import { trpc } from "~/utils/api";
+import { queryClient, trpc } from "~/utils/api";
 import { initializeToken } from "~/utils/session-store";
 
 import "../styles.css";
@@ -14,7 +13,7 @@ import "../styles.css";
 import { QueryClientProvider } from "@tanstack/react-query";
 
 // Prevent splash screen from auto-hiding until we're ready
-SplashScreen.preventAutoHideAsync();
+void SplashScreen.preventAutoHideAsync();
 
 function AppStateHandler() {
   const queryClient = useQueryClient();
@@ -25,7 +24,7 @@ function AppStateHandler() {
       (state: AppStateStatus) => {
         if (state === "active") {
           // Revalidate session when app returns from background
-          queryClient.invalidateQueries({
+          void queryClient.invalidateQueries({
             queryKey: trpc.auth.getSession.queryKey(),
           });
         }
@@ -43,12 +42,10 @@ export default function RootLayout() {
 
   useEffect(() => {
     initializeToken()
-      .catch((e) =>
-        console.error("[ROOT] Token initialization failed:", e),
-      )
+      .catch((e) => console.error("[ROOT] Token initialization failed:", e))
       .finally(() => {
         setReady(true);
-        SplashScreen.hideAsync();
+        void SplashScreen.hideAsync();
       });
   }, []);
 

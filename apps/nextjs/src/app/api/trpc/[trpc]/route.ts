@@ -2,8 +2,9 @@ import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 
 import { appRouter, createTRPCContext } from "@matchfaca/api";
 import { auth } from "@matchfaca/auth";
+import { env } from "~/env";
 
-const isDev = process.env.NODE_ENV === "development";
+const isDev = env.NODE_ENV === "development";
 
 /**
  * Configure CORS headers restricted to known origins.
@@ -16,7 +17,7 @@ const getAllowedOrigin = (req: Request): string => {
   const origin = req.headers.get("origin");
   if (!origin) return "";
 
-  const allowedOrigins = (process.env.ALLOWED_ORIGINS || "")
+  const allowedOrigins = (env.ALLOWED_ORIGINS || "")
     .split(",")
     .map((o) => o.trim())
     .filter(Boolean);

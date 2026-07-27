@@ -17,10 +17,7 @@ export const fightRequestRouter = {
         where: {
           challengerId: ctx.session.user.id,
           challengedId: input.challengedId,
-          OR: [
-            { status: "pending" },
-            { status: "accepted" },
-          ],
+          OR: [{ status: "pending" }, { status: "accepted" }],
         },
       });
 
