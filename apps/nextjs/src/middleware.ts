@@ -1,12 +1,12 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import NextAuth from "next-auth";
-import Discord from "next-auth/providers/discord";
 
-// Middleware only checks JWT — no Prisma adapter needed (edge-compatible)
-const { auth: nextAuthMiddleware } = NextAuth({ providers: [Discord] });
-
-export default nextAuthMiddleware(function middleware(_req: NextRequest) {
+// Pure edge middleware — no NextAuth wrapper needed.
+// Auth is handled by createTRPCContext (serverless) which uses PrismaAdapter
+// for database sessions. Using a separate JWT-only NextAuth instance here
+// would fail to decode the database-session cookie, producing false-positive
+// JWTSessionError logs.
+export default function middleware(_req: NextRequest) {
   const res = NextResponse.next();
 
   // Security headers
@@ -17,7 +17,7 @@ export default nextAuthMiddleware(function middleware(_req: NextRequest) {
   headers.set("Permissions-Policy", "geolocation=(), microphone=(), camera=()");
 
   return res;
-});
+}
 
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
