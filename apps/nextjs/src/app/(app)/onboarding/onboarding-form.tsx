@@ -8,22 +8,76 @@ import type { RouterInputs } from "@matchfaca/api";
 import { Button } from "@matchfaca/ui/button";
 import { useTRPC } from "~/trpc/react";
 
+import { PenLine, Swords, Scale, Zap, Flame, Shield, Eye, Skull, Hand, HelpCircle } from "lucide-react";
+
 // ─── Options ────────────────────────────────────────────────
 
 const STYLE_OPTIONS = [
-  { value: "boxe", label: "Boxe", icon: "🥊" },
-  { value: "muay_thai", label: "Muay Thai", icon: "🦵" },
-  { value: "jiu_jitsu", label: "Jiu-Jitsu", icon: "🤼" },
-  { value: "mma", label: "MMA", icon: "⚡" },
-  { value: "kickboxing", label: "Kickboxing", icon: "🦶" },
-  { value: "capoeira", label: "Capoeira", icon: "💃" },
-  { value: "karate", label: "Caratê", icon: "🥋" },
-  { value: "judô", label: "Judô", icon: "👘" },
-  { value: "taekwondo", label: "Taekwondo", icon: "🦘" },
-  { value: "luta_livre", label: "Luta Livre", icon: "🤼‍♂️" },
-  { value: "vale_tudo", label: "Vale-Tudo", icon: "💀" },
-  { value: "porrada_limpa", label: "Porrada Limpa", icon: "👊" },
-  { value: "outro", label: "Outro", icon: "❓" },
+  {
+    value: "boxe",
+    label: "Boxe",
+    Icon: Hand,
+  },
+  {
+    value: "muay_thai",
+    label: "Muay Thai",
+    Icon: Zap,
+  },
+  {
+    value: "jiu_jitsu",
+    label: "Jiu-Jitsu",
+    Icon: Shield,
+  },
+  {
+    value: "mma",
+    label: "MMA",
+    Icon: Flame,
+  },
+  {
+    value: "kickboxing",
+    label: "Kickboxing",
+    Icon: Zap,
+  },
+  {
+    value: "capoeira",
+    label: "Capoeira",
+    Icon: Eye,
+  },
+  {
+    value: "karate",
+    label: "Caratê",
+    Icon: Swords,
+  },
+  {
+    value: "judô",
+    label: "Judô",
+    Icon: Shield,
+  },
+  {
+    value: "taekwondo",
+    label: "Taekwondo",
+    Icon: Zap,
+  },
+  {
+    value: "luta_livre",
+    label: "Luta Livre",
+    Icon: Swords,
+  },
+  {
+    value: "vale_tudo",
+    label: "Vale-Tudo",
+    Icon: Skull,
+  },
+  {
+    value: "porrada_limpa",
+    label: "Porrada Limpa",
+    Icon: Hand,
+  },
+  {
+    value: "outro",
+    label: "Outro",
+    Icon: HelpCircle,
+  },
 ] as const;
 
 const WEIGHT_OPTIONS = [
@@ -106,8 +160,8 @@ export function OnboardingForm({ userId: _userId }: { userId: string }) {
     return (
       <div className="flex flex-col gap-8 py-8">
         <div className="text-center">
-          <div className="mx-auto mb-4 flex size-20 items-center justify-center rounded-full border-2 border-primary/20 bg-primary/5 text-4xl">
-            ✏️
+          <div className="mx-auto mb-4 flex size-20 items-center justify-center rounded-full border-2 border-primary/20 bg-primary/5">
+            <PenLine className="size-8 text-primary" />
           </div>
           <h2 className="text-xl font-bold text-foreground">
             Qual seu apelido de luta?
@@ -169,8 +223,8 @@ export function OnboardingForm({ userId: _userId }: { userId: string }) {
     return (
       <div className="flex flex-col gap-8 py-8">
         <div className="text-center">
-          <div className="mx-auto mb-4 flex size-20 items-center justify-center rounded-full border-2 border-primary/20 bg-primary/5 text-4xl">
-            🥋
+          <div className="mx-auto mb-4 flex size-20 items-center justify-center rounded-full border-2 border-primary/20 bg-primary/5">
+            <Swords className="size-8 text-primary" />
           </div>
           <h2 className="text-xl font-bold text-foreground">
             Qual sua arte marcial?
@@ -183,6 +237,7 @@ export function OnboardingForm({ userId: _userId }: { userId: string }) {
         <div className="grid grid-cols-2 gap-3">
           {STYLE_OPTIONS.map((style) => {
             const isSelected = data.fightingStyle === style.value;
+            const IconComponent = style.Icon;
             return (
               <button
                 key={style.value}
@@ -197,7 +252,11 @@ export function OnboardingForm({ userId: _userId }: { userId: string }) {
                     : "border-border bg-muted/20 text-muted-foreground hover:border-primary/30 hover:bg-muted/30"
                 }`}
               >
-                <span className="text-2xl">{style.icon}</span>
+                <IconComponent
+                  className={`size-6 ${
+                    isSelected ? "text-primary" : "text-muted-foreground/60"
+                  }`}
+                />
                 <span className="text-sm font-medium">{style.label}</span>
               </button>
             );
@@ -236,12 +295,13 @@ export function OnboardingForm({ userId: _userId }: { userId: string }) {
     const selectedStyle = STYLE_OPTIONS.find(
       (s) => s.value === data.fightingStyle,
     );
+    const SelectedIcon = selectedStyle?.Icon ?? Swords;
 
     return (
       <div className="flex flex-col gap-8 py-8">
         <div className="text-center">
-          <div className="mx-auto mb-4 flex size-20 items-center justify-center rounded-full border-2 border-primary/20 bg-primary/5 text-4xl">
-            ⚖️
+          <div className="mx-auto mb-4 flex size-20 items-center justify-center rounded-full border-2 border-primary/20 bg-primary/5">
+            <Scale className="size-8 text-primary" />
           </div>
           <h2 className="text-xl font-bold text-foreground">
             Quase lá!
@@ -259,8 +319,9 @@ export function OnboardingForm({ userId: _userId }: { userId: string }) {
             </div>
             <div>
               <p className="font-bold text-foreground">{data.nickname}</p>
-              <p className="text-sm text-muted-foreground">
-                {selectedStyle?.icon} {selectedStyle?.label}
+              <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                <SelectedIcon className="size-3.5" />
+                {selectedStyle?.label}
               </p>
             </div>
           </div>
@@ -269,9 +330,7 @@ export function OnboardingForm({ userId: _userId }: { userId: string }) {
         <div className="grid grid-cols-2 gap-3">
           <button
             type="button"
-            onClick={() =>
-              setData((d) => ({ ...d, weightClass: "" }))
-            }
+            onClick={() => setData((d) => ({ ...d, weightClass: "" }))}
             className={`rounded-xl border p-3 text-center text-sm transition-all ${
               !data.weightClass
                 ? "border-primary/40 bg-primary/10 text-primary"
