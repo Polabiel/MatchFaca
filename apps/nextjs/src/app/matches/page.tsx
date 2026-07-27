@@ -2,25 +2,9 @@ import { Suspense } from "react";
 
 import { auth } from "@matchfaca/auth";
 import { HydrateClient, prefetch, trpc } from "~/trpc/server";
+import { AuthRequired } from "../_components/auth-required";
 import { AuthShowcase } from "../_components/auth-showcase";
 import { MatchesList } from "./matches-list";
-
-function AuthRequired() {
-  return (
-    <div className="flex flex-col items-center justify-center gap-4 py-20 text-center">
-      <div className="flex size-20 items-center justify-center rounded-full border-2 border-dashed border-muted-foreground/30 text-4xl text-muted-foreground/50">
-        ⚔️
-      </div>
-      <h2 className="text-xl font-bold text-foreground">
-        Faça login para ver suas lutas
-      </h2>
-      <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
-        Use o botão "Entrar" no topo da página para se autenticar e acompanhar
-        seus confrontos.
-      </p>
-    </div>
-  );
-}
 
 export default async function MatchesPage() {
   const session = await auth();
@@ -42,7 +26,11 @@ export default async function MatchesPage() {
           </div>
         </header>
         <main className="px-4 pb-6 pt-4">
-          <AuthRequired />
+          <AuthRequired
+            icon="⚔️"
+            title="Faça login para ver suas lutas"
+            description='Use o botão "Entrar" no topo da página para se autenticar e acompanhar seus confrontos.'
+          />
         </main>
       </div>
     );

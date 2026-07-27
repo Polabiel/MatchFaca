@@ -6,7 +6,6 @@
  * tl;dr - this is where all the tRPC server stuff is created and plugged in.
  * The pieces you will need to use are documented accordingly near the end
  */
-import type { Session } from "@matchfaca/auth";
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
@@ -39,17 +38,18 @@ const isomorphicGetSession = async (headers: Headers) => {
  */
 export const createTRPCContext = async (opts: {
   headers: Headers;
-  session: Session | null;
 }) => {
-  const authToken = opts.headers.get("Authorization") ?? null;
   const session = await isomorphicGetSession(opts.headers);
+  const authToken = opts.headers.get("Authorization") ?? null;
 
   const source = opts.headers.get("x-trpc-source") ?? "unknown";
-  console.log(">>> tRPC Request from", source, "by", session?.user);
+  if (process.env.NODE_ENV !== "production") {
+    console.info("[tRPC] Request from %s by %s", source, session?.user.id ?? "anonymous");
+  }
 
   return {
-    session,
     db,
+    session,
     token: authToken,
   };
 };

@@ -6,20 +6,21 @@ import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
 
 import { appRouter, createTRPCContext } from "@matchfaca/api";
-import { auth } from "@matchfaca/auth";
 
 import { createQueryClient } from "./query-client";
 
 /**
  * This wraps the `createTRPCContext` helper and provides the required context for the tRPC API when
  * handling a tRPC call from a React Server Component.
+ *
+ * Session is resolved internally by createTRPCContext via isomorphicGetSession,
+ * which handles both cookie (Next.js) and Bearer-token (Expo) auth.
  */
 const createContext = cache(async () => {
   const heads = new Headers(await headers());
   heads.set("x-trpc-source", "rsc");
 
   return createTRPCContext({
-    session: await auth(),
     headers: heads,
   });
 });

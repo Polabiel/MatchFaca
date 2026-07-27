@@ -1,7 +1,7 @@
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
+import type { NextRequest } from "next/server";
 
 import { appRouter, createTRPCContext } from "@matchfaca/api";
-import { auth } from "@matchfaca/auth";
 import { env } from "~/env";
 
 const isDev = env.NODE_ENV === "development";
@@ -49,23 +49,26 @@ export const OPTIONS = (req: Request) => {
   return response;
 };
 
-const handler = auth(async (req) => {
-  const response = await fetchRequestHandler({
+/**
+ * Create context without the redundant auth() wrapper — createTRPCContext
+ * resolves the session internally via isomorphicGetSession, which handles
+ * both cookie-based (Next.js) and Bearer-token (Expo) authentication.
+ */
+const createContext = async (req: NextRequest) => {
+  return createTRPCContext({
+    headers: req.headers,
+  });
+};
+
+const handler = (req: NextRequest) =>
+  fetchRequestHandler({
     endpoint: "/api/trpc",
     router: appRouter,
     req,
-    createContext: () =>
-      createTRPCContext({
-        session: req.auth,
-        headers: req.headers,
-      }),
+    createContext: () => createContext(req),
     onError({ error, path }) {
       console.error(`>>> tRPC Error on '${path}'`, error);
     },
   });
-
-  setCorsHeaders(response, req);
-  return response;
-});
 
 export { handler as GET, handler as POST };
